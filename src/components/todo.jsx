@@ -85,14 +85,14 @@ const TodoCard = React.memo(
             <CardActions>
               <Button
                 size="small"
-                color="primary"
+                color="info"
                 onClick={() => handleCheck(todo.attributes.ischecked, todo.id)}
               >
                 {t("check")}
               </Button>
               <Button
                 size="small"
-                color="primary"
+                color="secondary"
                 onClick={handleEdit}
                 ref={EditRef}
               >
@@ -100,7 +100,7 @@ const TodoCard = React.memo(
               </Button>
               <Button
                 size="small"
-                color="primary"
+                color="error"
                 onClick={() => handleDeleteOpen(todo)}
               >
                 {t("Delete")}
