@@ -13,11 +13,12 @@ import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import {
   Typography,
-  Button,
   IconButton,
   Card,
   CardActions,
   CardContent,
+  Checkbox,
+  Tooltip,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { makeStyles } from "@mui/styles";
@@ -25,6 +26,9 @@ import { AddCircle } from "@mui/icons-material";
 import { Contax } from "../contexts/Contax";
 import { UserContext } from "../contexts/UserContext";
 import { DrawerContext } from "../contexts/ContextDrawer";
+// Actions Icons
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 const AdDialog = lazy(() => import("./AdDialog"));
 const EditDialog = lazy(() => import("./EditDialog"));
 const DeleteDialog = lazy(() => import("./DeleteDialog"));
@@ -83,31 +87,35 @@ const TodoCard = React.memo(
               </Typography>
             </CardContent>
             <CardActions>
-              <Button
-                variant="outlined"
-                size="small"
-                color="info"
-                onClick={() => handleCheck(todo.attributes.ischecked, todo.id)}
-              >
-                {t("check")}
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                color="secondary"
-                onClick={handleEdit}
-                ref={EditRef}
-              >
-                {t("Edit")}
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                color="error"
-                onClick={() => handleDeleteOpen(todo)}
-              >
-                {t("Delete")}
-              </Button>
+              <Tooltip arrow title={t("check")}>
+                <Checkbox
+                  size="small"
+                  checked={todo.attributes.ischecked}
+                  onClick={() =>
+                    handleCheck(todo.attributes.ischecked, todo.id)
+                  }
+                  color="info"
+                  sx={{
+                    color: "#FF5252",
+                  }}
+                />
+              </Tooltip>
+
+              <Tooltip arrow title={t("Edit")}>
+                <IconButton>
+                  <EditIcon
+                    onClick={handleEdit}
+                    ref={EditRef}
+                    color="secondary"
+                    fontSize="small"
+                  />
+                </IconButton>
+              </Tooltip>
+              <Tooltip arrow title={t("Delete")}>
+                <IconButton onClick={() => handleDeleteOpen(todo)}>
+                  <DeleteIcon color="primary" fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </CardActions>
           </Card>
         </Grid>
@@ -120,11 +128,13 @@ const TodoUI = React.memo(() => {
   TodoUI.displayName = "TodoUI";
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTodo, setDeleteTodo] = useState(null);
+  const { t, i18n } = useTranslation();
+  const IsRtl = i18n.language === "ar";
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [todoToEdit, setTodoToEdit] = useState(null);
-
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+
   const AddbuttonRef = useRef(null);
 
   const handleDeleteOpen = useCallback((todo) => {
@@ -274,15 +284,21 @@ const TodoUI = React.memo(() => {
       <main style={{ flexGrow: 1, padding: "20px 50px" }}>
         <div className={classes.toolbar} />
 
-        <IconButton
-          className={classes.floatingButton}
-          color="primary"
-          aria-label="Add Todo"
-          onClick={handleAdd}
-          ref={AddbuttonRef}
+        <Tooltip
+          title={t("Create a new Todo")}
+          placement={IsRtl ? "left" : "right"}
+          arrow
         >
-          <AddCircle style={{ fontSize: 60 }} />
-        </IconButton>
+          <IconButton
+            className={classes.floatingButton}
+            color="primary"
+            aria-label="Add Todo"
+            onClick={handleAdd}
+            ref={AddbuttonRef}
+          >
+            <AddCircle style={{ fontSize: 60 }} />
+          </IconButton>
+        </Tooltip>
 
         <Grid container spacing={2}>
           {filteredTodos.map((todo) => (
