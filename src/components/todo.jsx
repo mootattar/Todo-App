@@ -61,7 +61,7 @@ const TodoCard = React.memo(
           key={todo.id}
           sx={{ maxWidth: 335 }}
         >
-          <Card sx={{ maxWidth: 335 }} variant="outlined">
+          <Card sx={{ maxWidth: 335 }} variant="elevation">
             <CardContent>
               <Typography
                 variant="h5"
@@ -84,6 +84,7 @@ const TodoCard = React.memo(
             </CardContent>
             <CardActions>
               <Button
+                variant="outlined"
                 size="small"
                 color="info"
                 onClick={() => handleCheck(todo.attributes.ischecked, todo.id)}
@@ -91,6 +92,7 @@ const TodoCard = React.memo(
                 {t("check")}
               </Button>
               <Button
+                variant="outlined"
                 size="small"
                 color="secondary"
                 onClick={handleEdit}
@@ -99,6 +101,7 @@ const TodoCard = React.memo(
                 {t("Edit")}
               </Button>
               <Button
+                variant="outlined"
                 size="small"
                 color="error"
                 onClick={() => handleDeleteOpen(todo)}
