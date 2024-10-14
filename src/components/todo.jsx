@@ -96,7 +96,7 @@ const TodoCard = React.memo(
                   }
                   color="info"
                   sx={{
-                    color: "#FF5252",
+                    color: "#29b6f6",
                   }}
                 />
               </Tooltip>
