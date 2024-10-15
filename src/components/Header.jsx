@@ -34,7 +34,7 @@ function Header() {
       <Toolbar
         sx={{ justifyContent: "flex-start", gap: 1, alignItems: "center" }}
       >
-        <Button color="white" onClick={handleLang}>
+        <Button color="inherit" onClick={handleLang}>
           {i18n.language === "en" ? "ar" : "en"}
         </Button>
 

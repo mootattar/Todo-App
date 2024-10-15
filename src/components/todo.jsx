@@ -47,7 +47,8 @@ const CircularProgress = lazy(() => import("@mui/material/CircularProgress"));
 const TodoCard = React.memo(
   ({ todo, handleCheck, handleEditOpen, handleDeleteOpen }) => {
     TodoCard.displayName = "TodoCard";
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isRTL = i18n.language === "ar";
     const EditRef = useRef(null);
     const handleEdit = () => {
       handleEditOpen(todo);
@@ -70,12 +71,10 @@ const TodoCard = React.memo(
               <Typography
                 variant="h5"
                 component="h2"
+                className={`line-through ${
+                  todo.attributes.ischecked ? "checked" : ""
+                } ${isRTL ? "rtl" : "ltr"} `}
                 color={todo.attributes.ischecked ? "info" : "primary"}
-                sx={{
-                  textDecoration: todo.attributes.ischecked
-                    ? "line-through"
-                    : "none",
-                }}
               >
                 {todo.attributes.Title}
               </Typography>

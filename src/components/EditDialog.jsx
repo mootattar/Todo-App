@@ -128,7 +128,7 @@ function EditDialog({ title, body, open, close, id, ischecked }) {
               >
                 {t("Edit Todo")}
               </Typography>
-              <Button autoFocus color="error" type="submit">
+              <Button autoFocus color="inherit" type="submit">
                 {t("Submit")}
               </Button>
             </Toolbar>

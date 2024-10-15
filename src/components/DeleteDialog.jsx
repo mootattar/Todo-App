@@ -76,7 +76,7 @@ function DeleteDialog({ open, close, title, body, id }) {
             <Typography
               variant="h6"
               sx={{ flex: 1, marginLeft: "16px" }}
-              color={"warning"}
+              color={"inherit"}
             >
               {t("Delete Todo")}
             </Typography>
