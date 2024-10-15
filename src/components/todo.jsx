@@ -102,13 +102,8 @@ const TodoCard = React.memo(
               </Tooltip>
 
               <Tooltip arrow title={t("Edit")}>
-                <IconButton>
-                  <EditIcon
-                    onClick={handleEdit}
-                    ref={EditRef}
-                    color="secondary"
-                    fontSize="small"
-                  />
+                <IconButton onClick={handleEdit} ref={EditRef}>
+                  <EditIcon color="secondary" fontSize="small" />
                 </IconButton>
               </Tooltip>
               <Tooltip arrow title={t("Delete")}>

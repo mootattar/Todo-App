@@ -32,10 +32,7 @@ function App() {
     palette: {
       mode: dark ? "dark" : "light",
       primary: {
-        light: "#33c9dc",
         main: "#FF5722",
-        dark: "#d50000",
-        contrastText: "#fff",
       },
     },
 

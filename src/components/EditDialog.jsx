@@ -124,20 +124,11 @@ function EditDialog({ title, body, open, close, id, ischecked }) {
                   marginLeft: isRTL ? "0" : "16px",
                   marginRight: isRTL ? "16px" : "0",
                 }}
-                color={"primary"}
+                color={"inherit"}
               >
                 {t("Edit Todo")}
               </Typography>
-              <Button
-                autoFocus
-                color="inherit"
-                sx={{
-                  display: "block",
-                  color: "white",
-                  textAlign: "center",
-                }}
-                type="submit"
-              >
+              <Button autoFocus color="error" type="submit">
                 {t("Submit")}
               </Button>
             </Toolbar>
@@ -155,6 +146,7 @@ function EditDialog({ title, body, open, close, id, ischecked }) {
                 <TextField
                   variant="outlined"
                   fullWidth
+                  color="secondary"
                   inputRef={titleRef}
                   id="todoTitle"
                   label={t("Todo Title")}
@@ -218,6 +210,7 @@ function EditDialog({ title, body, open, close, id, ischecked }) {
                   variant="outlined"
                   fullWidth
                   multiline
+                  color="secondary"
                   minRows={1}
                   maxRows={3}
                   id="todoDetails"

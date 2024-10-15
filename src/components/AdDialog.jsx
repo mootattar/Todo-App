@@ -38,6 +38,7 @@ function AdDialog({ open, close }) {
       titleRef.current.focus();
     }
   };
+  const PasswordRef = useRef(null);
   const handleClose = useCallback(() => {
     setDetails({ title: "", body: "" });
     setError(null);
@@ -160,6 +161,7 @@ function AdDialog({ open, close }) {
                   inputRef={titleRef}
                   variant="outlined"
                   fullWidth
+                  color="info"
                   id="todoTitle"
                   label={t("Todo Title")}
                   name="title"
@@ -196,9 +198,7 @@ function AdDialog({ open, close }) {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      if (formRef.current) {
-                        formRef.current.requestSubmit();
-                      }
+                      PasswordRef.current.focus();
                     }
                   }}
                   slotProps={{
@@ -217,6 +217,8 @@ function AdDialog({ open, close }) {
                 <TextField
                   variant="outlined"
                   fullWidth
+                  inputRef={PasswordRef}
+                  color="info"
                   id="todoDetails"
                   label={t("Todo Details")}
                   name="body"
