@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { ModeContext } from "../contexts/Mode";
 
 function Header() {
-  console.log("reRendered the Header component");
   const { dark } = useContext(ModeContext);
   const { t, i18n } = useTranslation();
   const isRTL = useMemo(() => i18n.language === "ar", [i18n.language]);
