@@ -16,8 +16,8 @@ import { forwardRef } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import { useToast } from "../../contexts/ToastContext";
-import { useStore } from "../../contexts/ReducerContext";
+import { useToast } from "../../hooks/useToast";
+import { useStore } from "../../hooks/useStore";
 import {
   collection,
   deleteDoc,

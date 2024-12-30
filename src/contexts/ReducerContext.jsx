@@ -21,7 +21,6 @@ export default function ReducerContext({ children }) {
 
   return <Contax.Provider value={contextValue}>{children}</Contax.Provider>;
 }
-export const useStore = () => useContext(Contax);
 
 ReducerContext.propTypes = {
   children: PropTypes.node.isRequired,

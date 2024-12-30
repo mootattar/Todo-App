@@ -18,9 +18,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import { useTranslation } from "react-i18next";
 import LogOutDialog from "./Dialogs/LogOutDialog";
-import { useStore } from "../contexts/ReducerContext";
+import { useStore } from "../hooks/useStore";
 
-const drawerWidth = 240;
+const drawerWidth = "25vw";
 
 const useStyles = makeStyles((theme) => ({
   drawer: {

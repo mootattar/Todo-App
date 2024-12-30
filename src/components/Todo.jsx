@@ -20,8 +20,8 @@ import { UserContext } from "../contexts/UserContext";
 import { DrawerContext } from "../contexts/ContextDrawer";
 // components
 import TodoCard from "./TodoCard";
-import { useToast } from "../contexts/ToastContext";
-import { useStore } from "../contexts/ReducerContext";
+import { useToast } from "../hooks/useToast";
+import { useStore } from "../hooks/useStore";
 // firebase
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../fireBaseConfig";

@@ -25,9 +25,8 @@ import { v4 as uuidv4 } from "uuid";
 import CloseIcon from "@mui/icons-material/Close";
 import { UserContext } from "../../contexts/UserContext";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../../contexts/ToastContext";
-import { useStore } from "../../contexts/ReducerContext";
-
+import { useToast } from "../../hooks/useToast";
+import { useStore } from "../../hooks/useStore";
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });

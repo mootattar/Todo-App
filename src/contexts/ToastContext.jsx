@@ -1,8 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useState } from "react";
 import PropTypes from "prop-types";
 import Toast from "../shared/Toast";
 
-const ToastContext = createContext();
+export const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -21,10 +21,6 @@ export const ToastProvider = ({ children }) => {
     </ToastContext.Provider>
   );
 };
-export const useToast = () => {
-  return useContext(ToastContext);
-};
-
 ToastProvider.propTypes = {
   children: PropTypes.node,
 };

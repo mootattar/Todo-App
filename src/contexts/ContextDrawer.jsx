@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 export const DrawerContext = createContext();
 
 export default function DrawerProvider({ children }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState("All");
   const [error, setError] = useState("");
 
