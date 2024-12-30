@@ -19,7 +19,7 @@ import { setPersistence, browserLocalPersistence } from "firebase/auth";
 import React, { useContext, useRef, useState } from "react";
 
 // Import React Router Link
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Import i18next
 import { useTranslation } from "react-i18next";
@@ -29,7 +29,6 @@ import { ModeContext } from "../contexts/Mode";
 import { UserContext } from "../contexts/UserContext";
 
 function Signup() {
-  const navigate = useNavigate();
   const { userInfo, setUserInfo } = useContext(UserContext);
   // State for errors
   const [error, setError] = useState({
@@ -142,7 +141,7 @@ function Signup() {
         userName: user.displayName,
         email: user.email,
       });
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       console.log("Error", error);
       throw error;

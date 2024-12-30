@@ -13,7 +13,6 @@ import React, { forwardRef, useContext } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 // firebase
 import { signOut } from "firebase/auth";
 import { auth } from "../../../fireBaseConfig";
@@ -25,7 +24,6 @@ const Transition = forwardRef(function Transition(props, ref) {
 
 function LogOutDialog({ open, close }) {
   const { setUserInfo } = useContext(UserContext);
-  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -34,7 +32,7 @@ function LogOutDialog({ open, close }) {
       await signOut(auth);
       close();
       localStorage.removeItem("token");
-      navigate("/login");
+      window.location.href = "/login";
       setUserInfo({
         Id: null,
         userName: "",

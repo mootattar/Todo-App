@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 // Import React hooks
 import React, { useContext, useRef, useState } from "react";
 // Import React Router Link
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 // Import MUI icons
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 // Import MUI Grid component
@@ -30,8 +30,6 @@ import { UserContext } from "../contexts/UserContext";
 // mainURL
 
 function Login() {
-  // navigate
-  const navigate = useNavigate();
   // userInfo
   const { userInfo, setUserInfo } = useContext(UserContext);
   // Get the current theme mode (dark or light) from the context
@@ -89,7 +87,7 @@ function Login() {
         userName: user.displayName,
         email: user.email,
       });
-      navigate("/");
+      window.location.href = "/";
     } catch (error) {
       console.log("Error", error);
       throw error;

@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import LogOutDialog from "./Dialogs/LogOutDialog";
 import { useStore } from "../hooks/useStore";
 
-const drawerWidth = "25vw";
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
@@ -80,7 +80,8 @@ function SideBar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
   const classes = useStyles();
-  const { open, selected, setOpen, setSelected } = useContext(DrawerContext);
+  const { open, selected, showHideDrawer, setSelected } =
+    useContext(DrawerContext);
   const [LogOutDialogOpen, setLogOutDialogOpen] = useState(false);
   const handleLogoutDialog = useCallback(() => {
     setLogOutDialogOpen(!LogOutDialogOpen);
@@ -94,9 +95,6 @@ function SideBar() {
     }
   };
 
-  const handleOpen = useCallback(() => {
-    setOpen((prev) => !prev);
-  }, [setOpen]);
   const values = [
     {
       value: "Home",
@@ -133,7 +131,7 @@ function SideBar() {
           top: 70,
         }}
         color="primary"
-        onClick={handleOpen}
+        onClick={showHideDrawer}
       >
         {open ? (
           <MenuOpenIcon

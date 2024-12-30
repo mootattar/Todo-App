@@ -6,27 +6,17 @@ export const DrawerContext = createContext();
 export default function DrawerProvider({ children }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState("All");
-  const [error, setError] = useState("");
-
-  const [drawer, setDrawer] = useState({
-    open: false,
-    description: "",
-    title: "",
-    body: "",
-    id: null,
-  });
+  const showHideDrawer = () => {
+    setOpen(!open);
+  };
 
   return (
     <DrawerContext.Provider
       value={{
         open,
-        setOpen,
+        showHideDrawer,
         selected,
         setSelected,
-        drawer,
-        setDrawer,
-        error,
-        setError,
       }}
     >
       {children}
