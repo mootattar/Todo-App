@@ -1,13 +1,4 @@
-import React, {
-  lazy,
-  useContext,
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-  Suspense,
-  useRef,
-} from "react";
+import React, { lazy, useContext, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 // mui components
 
@@ -26,11 +17,8 @@ import { useStore } from "../hooks/useStore";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../fireBaseConfig";
 import { doc, updateDoc } from "firebase/firestore";
-
-// Actions Icons
-const AdDialog = lazy(() => import("./Dialogs/AdDialog"));
-const EditDialog = lazy(() => import("./Dialogs/EditDialog"));
-const DeleteDialog = lazy(() => import("./Dialogs/DeleteDialog"));
+import { useCheckTaskDate } from "../hooks/useCheckTaskDate";
+import { useShowHideDialog } from "../hooks/useDialog";
 
 const useStyles = makeStyles((theme) => ({
   floatingButton: {
@@ -45,10 +33,26 @@ const CircularProgress = lazy(() => import("@mui/material/CircularProgress"));
 
 const TodoUI = React.memo(() => {
   TodoUI.displayName = "TodoUI";
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteTodo, setDeleteTodo] = useState(null);
   const { t, i18n } = useTranslation();
   const IsRtl = i18n.language === "ar";
+  // useRef
+  const AddbuttonRef = useRef(null);
+  // contexts
+  const { selected } = useContext(DrawerContext);
+  const { userInfo } = useContext(UserContext);
+
+  const handleShowAdd = () => {
+    handleAdd();
+    AddbuttonRef.current.blur();
+  };
+
+  // custom hooks
+  const { state, dispatch } = useStore();
+  const classes = useStyles();
+  const { handleShow } = useToast();
+  const { handleAdd } = useShowHideDialog();
+  const { checkAndUpdateTasks } = useCheckTaskDate();
+  // categories
   const categories = [
     {
       title: "Home",
@@ -71,70 +75,62 @@ const TodoUI = React.memo(() => {
       color: "#ff8a65",
     },
   ];
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [todoToEdit, setTodoToEdit] = useState(null);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-
-  const AddbuttonRef = useRef(null);
-
-  const handleDeleteOpen = useCallback((todo) => {
-    setDeleteDialogOpen(true);
-    setDeleteTodo(todo);
-  }, []);
-
-  const handleDeleteClose = useCallback(() => {
-    setDeleteDialogOpen(false);
-    setDeleteTodo(null);
-  }, []);
-
-  const handleAdd = useCallback(() => {
-    AddbuttonRef.current.blur();
-    setAddDialogOpen(!addDialogOpen);
-  }, [addDialogOpen]);
-  const handleEditOpen = useCallback((todo) => {
-    setTodoToEdit(todo);
-    setEditDialogOpen(true);
-  }, []);
-
-  const handleEditClose = useCallback(() => {
-    setEditDialogOpen(false);
-    setTodoToEdit(null);
-  }, []);
-
-  const { state, dispatch } = useStore();
-  const { selected } = useContext(DrawerContext);
-  const classes = useStyles();
-
-  const { userInfo } = useContext(UserContext);
-  const { handleShow } = useToast();
 
   const filteredTodos = useMemo(() => {
     switch (selected) {
       case "Home":
-        return state.todos.filter((todo) => todo.cat === "Home");
+        return state.todos.filter(
+          (todo) => todo.cat === "Home" && todo.endOfDay > todo.date
+        );
       case "Work":
-        return state.todos.filter((todo) => todo.cat === "Work");
+        return state.todos.filter(
+          (todo) => todo.cat === "Work" && todo.endOfDay > todo.date
+        );
       case "Personal":
-        return state.todos.filter((todo) => todo.cat === "Personal");
+        return state.todos.filter(
+          (todo) => todo.cat === "Personal" && todo.endOfDay > todo.date
+        );
       case "Health":
-        return state.todos.filter((todo) => todo.cat === "Health");
+        return state.todos.filter(
+          (todo) => todo.cat === "Health" && todo.endOfDay > todo.date
+        );
       case "Study":
-        return state.todos.filter((todo) => todo.cat === "Study");
+        return state.todos.filter(
+          (todo) => todo.cat === "Study" && todo.endOfDay > todo.date
+        );
       case "Devotional":
-        return state.todos.filter((todo) => todo.cat === "Devotional");
+        return state.todos.filter(
+          (todo) => todo.cat === "Devotional" && todo.endOfDay > todo.date
+        );
       case "Other":
-        return state.todos.filter((todo) => todo.cat === "Other");
+        return state.todos.filter(
+          (todo) => todo.cat === "Other" && todo.endOfDay > todo.date
+        );
       case "Completed":
         return state.todos.filter((todo) => todo.ischecked);
       case "Pending":
-        return state.todos.filter((todo) => !todo.ischecked);
+        return state.todos.filter((todo) => todo.pending);
+      case "Uncompleted":
+        return state.todos.filter((todo) => !todo.pending && !todo.ischecked);
       case "All":
+        return state.todos.filter((todo) => {
+          return todo.endOfDay > new Date().toISOString();
+        });
       default:
         return state.todos;
     }
   }, [selected, state.todos]);
 
-  const handleCheck = async (ischecked, id) => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkAndUpdateTasks();
+    }, 60000);
+    return () => clearInterval(interval);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.todos.length]);
+
+  const handleCheck = async (todo, id) => {
     dispatch({ type: "completed", payload: id });
     handleShow("Task Completed Successfully");
     try {
@@ -147,10 +143,11 @@ const TodoUI = React.memo(() => {
         const todoDoc = querySnapshot.docs[0];
         const todoRef = doc(db, "todos", todoDoc.id);
 
-        await updateDoc(todoRef, { ischecked: !ischecked });
-        console.log("Document updated successfully");
+        await updateDoc(todoRef, {
+          ischecked: !todo.ischecked,
+          pending: !todo.pending,
+        });
       } else {
-        console.log(id, q);
         console.error("No document found with the given external ID.");
       }
     } catch (error) {
@@ -213,30 +210,6 @@ const TodoUI = React.memo(() => {
 
   return (
     <>
-      <Suspense fallback={<div>Loading...</div>}>
-        <EditDialog
-          title={todoToEdit?.Title || ""}
-          body={todoToEdit?.body || ""}
-          cat={todoToEdit?.cat || "Other"}
-          open={editDialogOpen}
-          close={handleEditClose}
-          id={todoToEdit?.id || null}
-          ischecked={todoToEdit?.ischecked || false}
-        />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <AdDialog open={addDialogOpen} close={handleAdd} />
-      </Suspense>
-      <Suspense fallback={<div>Loading...</div>}>
-        <DeleteDialog
-          open={deleteDialogOpen}
-          close={handleDeleteClose}
-          title={deleteTodo?.Title || ""}
-          body={deleteTodo?.body || ""}
-          cat={deleteTodo?.cat || "Other"}
-          id={deleteTodo?.id || null}
-        />
-      </Suspense>
       <main style={{ flexGrow: 1, padding: "20px 50px" }}>
         <div className={classes.toolbar} />
 
@@ -249,7 +222,7 @@ const TodoUI = React.memo(() => {
             className={classes.floatingButton}
             color="primary"
             aria-label="Add Todo"
-            onClick={handleAdd}
+            onClick={handleShowAdd}
             ref={AddbuttonRef}
           >
             <AddCircle style={{ fontSize: 60 }} />
@@ -273,8 +246,6 @@ const TodoUI = React.memo(() => {
                 }
                 todo={todo}
                 handleCheck={handleCheck}
-                handleEditOpen={handleEditOpen}
-                handleDeleteOpen={handleDeleteOpen}
               />
             </div>
           ))}

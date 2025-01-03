@@ -12,42 +12,6 @@ input[type="number"] {
 * {
   transition: background-color 0.5s ease-in-out, color 0.2s ease-in-out;
 }
-.line-through {
-  display: inline-block;
-  position: relative;
-  transition: all 0.5s ease-in-out;
-}
-
-.line-through::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  height: 2px;
-  background-color: #29b6f6;
-  transform: translateY(-50%);
-  width: 0;
-  transition: all 0.2s ease;
-}
-
-.line-through.checked.ltr::before {
-  left: 0;
-  width: 100%;
-}
-
-.line-through.checked.rtl::before {
-  right: 0;
-  width: 100%;
-}
-
-.line-through:not(.checked).ltr::before {
-  right: 0;
-  width: 0;
-}
-
-.line-through:not(.checked).rtl::before {
-  left: 0;
-  width: 0;
-}
 
 .switch {
   cursor: pointer;

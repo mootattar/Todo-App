@@ -117,6 +117,6 @@ function LogOutDialog({ open, close }) {
 export default React.memo(LogOutDialog);
 
 LogOutDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired,
+  open: PropTypes.bool,
+  close: PropTypes.func,
 };

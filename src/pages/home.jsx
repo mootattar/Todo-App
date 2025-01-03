@@ -9,10 +9,12 @@ import { UserContext } from "../contexts/UserContext";
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../fireBaseConfig";
+import { useNavigate } from "react-router-dom";
 
 const MemoizedTodo = React.memo(Todo);
 const Home = () => {
   const { userInfo, setUserInfo } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -22,11 +24,13 @@ const Home = () => {
           userName: currentUser.displayName,
           email: currentUser.email,
         });
+      } else {
+        navigate("/login");
       }
     });
 
     return () => unsubscribe();
-  }, [setUserInfo]);
+  }, [setUserInfo, navigate]);
 
   if (!userInfo.userName) {
     return (

@@ -1,5 +1,3 @@
-import PropTypes from "prop-types";
-
 import {
   Typography,
   Button,
@@ -13,9 +11,10 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import Grid from "@mui/material/Grid2";
+import { useSendData } from "../../hooks/useSendData";
 
 import { forwardRef } from "react";
 
@@ -23,34 +22,40 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "react-i18next";
 import { useToast } from "../../hooks/useToast";
 import { useStore } from "../../hooks/useStore";
-// fire base
-import { db } from "../../../fireBaseConfig";
-import {
-  collection,
-  doc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+
+import PropTypes from "prop-types";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function EditDialog({ title, body, cat, open, close, id, ischecked }) {
+function EditDialog({ open, close, todo }) {
   const { handleShow } = useToast();
   const [error, setError] = useState("");
   const [details, setDetails] = useState({
     title: "",
     body: "",
-    category: "",
+    cat: "",
   });
   const { dispatch } = useStore();
   const { t, i18n } = useTranslation();
+  const { editTodo } = useSendData();
   const isRTL = i18n.language === "ar";
   const formRef = useRef(null);
   const titleRef = useRef(null);
+
+  const handleChange = (e) => {
+    setDetails({
+      ...details,
+      cat: e.target.value,
+    });
+  };
+
+  const handleOnEntered = () => {
+    if (titleRef.current) {
+      titleRef.current.focus();
+    }
+  };
 
   const categories = [
     {
@@ -69,72 +74,25 @@ function EditDialog({ title, body, cat, open, close, id, ischecked }) {
       name: "Other",
     },
   ];
-  const handleChange = (e) => {
-    setDetails({
-      ...details,
-      category: e.target.value,
-    });
-  };
 
-  const handleOnEntered = () => {
-    if (titleRef.current) {
-      titleRef.current.focus();
-    }
-  };
-
-  const handleClose = useCallback(() => {
-    close();
+  const handleClose = () => {
+    close(null);
     setError(null);
-  }, [close]);
+  };
 
-  const editTodo = async (e) => {
+  const submitEdit = (e) => {
     e.preventDefault();
-    if (details.title.trim().length < 1 && details.body.trim().length < 1) {
-      setError(t("you Cannot make the task empty"));
-      return;
-    }
-    dispatch({
-      type: "updateTodo",
-      payload: {
-        id: id,
-        Title: details.title,
-        body: details.body,
-        cat: details.category,
-        ischecked: ischecked,
-      },
-    });
-    handleClose();
-    handleShow("Task updated successfully");
-    try {
-      // إنشاء استعلام للبحث عن المهمة بناءً على المعرف الخارجي
-      const todosCollection = collection(db, "todos");
-      const q = query(todosCollection, where("id", "==", id));
-
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const todoDoc = querySnapshot.docs[0];
-        const todoRef = doc(db, "todos", todoDoc.id);
-
-        // تحديث الحقل المطلوب
-        await updateDoc(todoRef, {
-          Title: details.title,
-          body: details.body,
-          cat: details.category,
-        });
-        console.log("Document updated successfully");
-      } else {
-        console.log(id, q);
-        console.error("No document found with the given external ID.");
-      }
-    } catch (error) {
-      console.error("Error updating document:", error);
-    }
+    editTodo(details, setError, t, todo, dispatch, handleClose, handleShow);
   };
 
   useEffect(() => {
-    setDetails({ title, body, category: cat });
-  }, [title, body, cat]);
+    if (!todo) return;
+    setDetails({
+      title: todo?.Title,
+      body: todo?.body,
+      cat: todo?.cat,
+    });
+  }, [todo]);
 
   return (
     <>
@@ -145,7 +103,13 @@ function EditDialog({ title, body, cat, open, close, id, ischecked }) {
         TransitionComponent={Transition}
         TransitionProps={{ onEntered: handleOnEntered }}
       >
-        <form noValidate onSubmit={editTodo} ref={formRef}>
+        <form
+          noValidate
+          onSubmit={(e) => {
+            submitEdit(e);
+          }}
+          ref={formRef}
+        >
           <AppBar
             sx={{ position: "relative", direction: isRTL ? "rtl" : "ltr" }}
           >
@@ -312,7 +276,7 @@ function EditDialog({ title, body, cat, open, close, id, ischecked }) {
                 <FormControl fullWidth color="info">
                   <InputLabel>{t("Choose a category")}</InputLabel>
                   <Select
-                    value={details.category}
+                    value={details.cat} // the value is not details.cat why ? and how can i fix it ?
                     label={t("Choose a category")}
                     onChange={(e) => handleChange(e)}
                   >
@@ -337,9 +301,5 @@ export default React.memo(EditDialog);
 EditDialog.propTypes = {
   open: PropTypes.bool,
   close: PropTypes.func,
-  title: PropTypes.string,
-  body: PropTypes.string,
-  cat: PropTypes.string,
-  id: PropTypes.any,
-  ischecked: PropTypes.bool,
+  todo: PropTypes.object,
 };

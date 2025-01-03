@@ -27,5 +27,5 @@ export default function ModeProvider({ children }) {
 }
 
 ModeProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };

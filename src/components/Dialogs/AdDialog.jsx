@@ -19,8 +19,7 @@ import Grid from "@mui/material/Grid2";
 
 import { forwardRef, useContext } from "react";
 
-// any id
-import { v4 as uuidv4 } from "uuid";
+import { useSendData } from "../../hooks/useSendData";
 
 import CloseIcon from "@mui/icons-material/Close";
 import { UserContext } from "../../contexts/UserContext";
@@ -30,15 +29,13 @@ import { useStore } from "../../hooks/useStore";
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-
-import { collection, addDoc } from "firebase/firestore";
-import { db } from "../../../fireBaseConfig";
 function AdDialog({ open, close }) {
   const { t, i18n } = useTranslation();
   const { userInfo } = useContext(UserContext);
   const { dispatch } = useStore();
   const [error, setError] = useState(null);
   const { handleShow } = useToast();
+  const { addTodoToAPI } = useSendData();
   const [details, setDetails] = useState({
     title: "",
     body: "",
@@ -82,126 +79,18 @@ function AdDialog({ open, close }) {
     setError(null);
     close();
   }, [close]);
-
-  const addTodoToAPI = useCallback(
-    async (e) => {
-      e.preventDefault();
-      if (details.title.trim().length < 1 && details.body.trim().length < 1) {
-        setError(t("you Cannot add an empty task"));
-        return;
-      }
-      const now = new Date();
-      const formattedDate = now.toLocaleString(
-        i18n.language === "ar" ? "ar-JO" : "en-US",
-        {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "numeric",
-          hour12: true,
-        }
-      );
-
-      const localTodo = {
-        id: uuidv4(),
-        Title: details.title,
-        body: details.body,
-        Time: formattedDate,
-        userId: userInfo.Id,
-        ischecked: false,
-        cat: details.cat,
-      };
-
-      dispatch({
-        type: "CREATE_TODOS_SUCCESS",
-        payload: localTodo,
-      });
-      handleClose();
-      handleShow(t("Task added successfully"));
-
-      try {
-        await addDoc(collection(db, "todos"), localTodo);
-      } catch (error) {
-        console.error("Error adding document: ", error);
-        setError(t("Failed to add the task."));
-      }
-    },
-    [t, i18n.language, userInfo, dispatch, details, handleClose, handleShow]
-  );
-
-  // const addTodoToAPI = useCallback(
-  //   async (e) => {
-  //     e.preventDefault();
-  //     if (details.title.trim().length < 1 && details.body.trim().length < 1) {
-  //       setError(t("you Cannot add an empty task"));
-  //       return;
-  //     }
-  //     const now = new Date();
-  //     const formattedDate = now.toLocaleString(
-  //       i18n.language === "ar" ? "ar-JO" : "en-US",
-  //       {
-  //         year: "numeric",
-  //         month: "numeric",
-  //         day: "numeric",
-  //         hour: "numeric",
-  //         hour12: true,
-  //       }
-  //     );
-  //     const localTodo = {
-  //       Title: details.title,
-  //       body: details.body,
-  //       Time: formattedDate,
-  //       userId: userInfo.Id,
-  //       cat: details.cat,
-  //     };
-
-  //     dispatch({
-  //       type: "CREATE_TODOS_SUCCESS",
-  //       payload: localTodo, // إضافة المهمة إلى الحالة محليًا
-  //     });
-  //     try {
-  //       const response = await fetch(`${mainUrl}/api/todos`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           data: {
-  //             Title: details.title,
-  //             body: details.body,
-  //             Time: formattedDate,
-  //             userId: userInfo.Id,
-  //             cat: details.cat,
-  //           },
-  //         }),
-  //       });
-
-  //       if (!response.ok) {
-  //         throw new Error("Failed to add the task.");
-  //       }
-  //       const result = await response.json();
-  //       dispatch({
-  //         type: "CREATE_TODOS_SUCCESS",
-  //         payload: result.data,
-  //       });
-  //       handleClose();
-  //       handleShow("Task added successfully");
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       dispatch({ type: "CREATE_TODOS_FAILURE", payload: error.message });
-  //     }
-  //   },
-  //   [
-  //     t,
-  //     i18n.language,
-  //     userInfo,
-  //     setError,
-  //     dispatch,
-  //     details,
-  //     handleClose,
-  //     handleShow,
-  //   ]
-  // );
+  const addTodo = (e) => {
+    e.preventDefault();
+    addTodoToAPI(
+      details,
+      setError,
+      t,
+      userInfo,
+      dispatch,
+      handleClose,
+      handleShow
+    );
+  };
   const isRTL = i18n.language === "ar";
 
   const style = {
@@ -235,7 +124,7 @@ function AdDialog({ open, close }) {
         TransitionComponent={Transition}
         TransitionProps={{ onEntered: handleOnEntered }}
       >
-        <form noValidate onSubmit={addTodoToAPI} ref={formRef}>
+        <form noValidate onSubmit={(e) => addTodo(e)} ref={formRef}>
           <AppBar
             sx={{ position: "relative", direction: isRTL ? "rtl" : "ltr" }}
           >
@@ -386,6 +275,6 @@ function AdDialog({ open, close }) {
 export default React.memo(AdDialog);
 
 AdDialog.propTypes = {
-  open: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired,
+  open: PropTypes.bool,
+  close: PropTypes.func,
 };

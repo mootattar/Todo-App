@@ -4,6 +4,7 @@ import {
   faListCheck,
   faList,
   faClock,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
@@ -24,12 +25,12 @@ const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   drawer: {
-    width: drawerWidth,
+    width: theme.breakpoints.up("sm") ? drawerWidth : 100,
     flexShrink: 0,
     transition: "all 0.2s ease-in-out",
   },
   drawerPaper: {
-    width: drawerWidth,
+    width: theme.breakpoints.up("sm") ? drawerWidth : 100,
   },
   avatar: {
     height: 110,
@@ -47,6 +48,7 @@ function SideBar() {
     All: 0,
     Completed: 0,
     Pending: 0,
+    Uncompleted: 0,
     Home: 0,
     Personal: 0,
     Health: 0,
@@ -54,9 +56,15 @@ function SideBar() {
     Other: 0,
   });
   const TodosNumber = () => {
-    const All = state.todos.length;
+    const All = state.todos.filter(
+      (todo) => todo.endOfDay > new Date().toISOString()
+    ).length;
     const Completed = state.todos.filter((todo) => todo.ischecked).length;
-    const Pending = state.todos.filter((todo) => !todo.ischecked).length;
+    const Pending = state.todos.filter((todo) => todo.pending).length;
+    const Uncompleted = state.todos.filter(
+      (todo) => !todo.pending && !todo.ischecked
+    ).length;
+
     const Home = state.todos.filter((todo) => todo.cat === "Home").length;
     const Personal = state.todos.filter(
       (todo) => todo.cat === "Personal"
@@ -68,6 +76,7 @@ function SideBar() {
       All,
       Completed,
       Pending,
+      Uncompleted,
       Home,
       Personal,
       Health,
@@ -157,7 +166,6 @@ function SideBar() {
           <p>{userInfo.userName}</p>
         </center>
         <Divider />
-
         {userInfo.userName ? (
           <>
             <ToggleButtonGroup
@@ -169,21 +177,30 @@ function SideBar() {
               fullWidth
             >
               <ToggleButton value="All" aria-label="All" sx={style}>
-                <FontAwesomeIcon icon={faList} />
+                <FontAwesomeIcon icon={faList} color="#e879f9" />
                 {t("All")}
                 <span style={{ fontWeight: "bold" }}>{count.All}</span>
               </ToggleButton>
 
               <ToggleButton value="Completed" aria-label="Completed" sx={style}>
-                <FontAwesomeIcon icon={faListCheck} />
+                <FontAwesomeIcon icon={faListCheck} color="#86efac" />
                 {t("Completed")}
                 <span style={{ fontWeight: "bold" }}>{count.Completed}</span>
               </ToggleButton>
 
               <ToggleButton value="Pending" aria-label="Pending" sx={style}>
-                <FontAwesomeIcon icon={faClock} />
+                <FontAwesomeIcon icon={faClock} color="#f59e0b" />
                 {t("Pending")}
                 <span style={{ fontWeight: "bold" }}>{count.Pending}</span>
+              </ToggleButton>
+              <ToggleButton
+                value="Uncompleted"
+                aria-label="Uncompleted"
+                sx={style}
+              >
+                <FontAwesomeIcon icon={faXmark} color="#ef4444" />
+                {t("Uncompleted")}
+                <span style={{ fontWeight: "bold" }}>{count.Uncompleted}</span>
               </ToggleButton>
               {values.map((value) => (
                 <ToggleButton

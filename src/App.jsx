@@ -14,6 +14,7 @@ import { useMediaQuery } from "@mui/material";
 import { ModeContext } from "./contexts/Mode";
 import { useTranslation } from "react-i18next";
 import { ToastProvider } from "./contexts/ToastContext";
+import { DialogProvider } from "./contexts/DialogContext";
 
 function App() {
   const { dark } = useContext(ModeContext);
@@ -67,20 +68,24 @@ function App() {
       <BrowserRouter>
         <CssBaseline />
         <ToastProvider>
-          <div
-            style={{ display: isHomePage ? "flex" : iSmall ? "flex" : "block" }}
-            dir={i18n.language === "ar" ? "rtl" : "ltr"}
-          >
-            <Header />
-            <SideBar />
-            <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-              </Routes>
-            </Suspense>
-          </div>
+          <DialogProvider>
+            <div
+              style={{
+                display: isHomePage ? "flex" : iSmall ? "flex" : "block",
+              }}
+              dir={i18n.language === "ar" ? "rtl" : "ltr"}
+            >
+              <Header />
+              <SideBar />
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                </Routes>
+              </Suspense>
+            </div>
+          </DialogProvider>
         </ToastProvider>
       </BrowserRouter>
     </ThemeProvider>

@@ -25,5 +25,5 @@ export default function DrawerProvider({ children }) {
 }
 
 DrawerProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };

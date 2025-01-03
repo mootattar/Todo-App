@@ -7,7 +7,7 @@ import {
   IconButton,
   TextField,
 } from "@mui/material";
-import React, { useCallback } from "react";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import Grid from "@mui/material/Grid2";
 
@@ -18,26 +18,20 @@ import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types";
 import { useToast } from "../../hooks/useToast";
 import { useStore } from "../../hooks/useStore";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
-import { db } from "../../../fireBaseConfig";
-
+import { useSendData } from "../../hooks/useSendData";
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function DeleteDialog({ open, close, title, body, cat, id }) {
+function DeleteDialog({ open, close, todo }) {
+  // custom hooks
   const { handleShow } = useToast();
   const { dispatch } = useStore();
+  const { deleteOne } = useSendData();
+  // translation
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
-
+  // style
   const style = {
     "& .MuiInputLabel-asterisk": {
       transition: "none",
@@ -62,32 +56,6 @@ function DeleteDialog({ open, close, title, body, cat, id }) {
         : "translate(14px, -9px) scale(0.75)",
     },
   };
-
-  const deleteOne = useCallback(async () => {
-    dispatch({
-      type: "deleteTodo",
-      payload: { id: id },
-    });
-    close();
-    handleShow("Task deleted successfully");
-    try {
-      const todosCollection = collection(db, "todos");
-      const q = query(todosCollection, where("id", "==", id));
-
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const todoDoc = querySnapshot.docs[0];
-        const todoRef = doc(db, "todos", todoDoc.id);
-        await deleteDoc(todoRef);
-        console.log("Document deleted successfully");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      dispatch({ type: "Delete_TODOS_FAILURE", payload: error.message });
-    }
-  }, [dispatch, id, close, handleShow]);
-
   return (
     <>
       <Dialog
@@ -121,7 +89,7 @@ function DeleteDialog({ open, close, title, body, cat, id }) {
                 color: "white",
                 textAlign: "center",
               }}
-              onClick={deleteOne}
+              onClick={() => deleteOne({ todo, dispatch, close, handleShow })}
             >
               {t("Yes")}
             </Button>
@@ -161,7 +129,7 @@ function DeleteDialog({ open, close, title, body, cat, id }) {
                 multiline
                 minRows={1}
                 maxRows={5}
-                value={title}
+                value={todo?.Title}
                 slotProps={{
                   formHelperText: {
                     style: {
@@ -188,7 +156,7 @@ function DeleteDialog({ open, close, title, body, cat, id }) {
                 multiline
                 minRows={1}
                 maxRows={5}
-                value={body}
+                value={todo?.body}
                 slotProps={{
                   formHelperText: {
                     style: {
@@ -215,7 +183,7 @@ function DeleteDialog({ open, close, title, body, cat, id }) {
                 multiline
                 minRows={1}
                 maxRows={5}
-                value={cat}
+                value={todo?.cat}
                 slotProps={{
                   formHelperText: {
                     style: {
@@ -242,8 +210,5 @@ export default React.memo(DeleteDialog);
 DeleteDialog.propTypes = {
   open: PropTypes.bool,
   close: PropTypes.func,
-  title: PropTypes.string,
-  body: PropTypes.string,
-  cat: PropTypes.string,
-  id: PropTypes.any,
+  todo: PropTypes.object,
 };

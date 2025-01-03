@@ -47,6 +47,7 @@ const todosReducer = (state = initialState, action) => {
           return {
             ...todo,
             ischecked: !todo.ischecked,
+            pending: !todo.pending,
           };
         }
         return todo;
@@ -64,6 +65,21 @@ const todosReducer = (state = initialState, action) => {
             Title: action.payload.Title,
             body: action.payload.body,
             cat: action.payload.cat,
+          };
+        }
+        return todo;
+      });
+      return {
+        ...state,
+        todos: newTodos,
+      };
+    }
+    case "checkAndUpdateTasks": {
+      const newTodos = state?.todos?.map((todo) => {
+        if (todo.id === action.payload.id) {
+          return {
+            ...todo,
+            pending: !todo.pending,
           };
         }
         return todo;

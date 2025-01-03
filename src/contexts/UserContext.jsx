@@ -24,5 +24,5 @@ export default function UserContextProvider({ children }) {
   );
 }
 UserContextProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };

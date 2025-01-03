@@ -23,5 +23,5 @@ export default function ReducerContext({ children }) {
 }
 
 ReducerContext.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
 };
