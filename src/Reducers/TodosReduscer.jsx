@@ -47,7 +47,8 @@ const todosReducer = (state = initialState, action) => {
           return {
             ...todo,
             ischecked: !todo.ischecked,
-            pending: !todo.pending,
+            pending:
+              todo.endOfDay > new Date().toISOString() ? !todo.pending : false,
           };
         }
         return todo;

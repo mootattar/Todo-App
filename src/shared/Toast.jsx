@@ -6,7 +6,7 @@ import { Alert, Stack } from "@mui/material";
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 
-export default function Toast({ open, setOpen, message }) {
+export default function Toast({ open, setOpen, message, status }) {
   const { t } = useTranslation();
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -40,9 +40,7 @@ export default function Toast({ open, setOpen, message }) {
         <Alert
           action={action}
           variant="filled"
-          severity={
-            message === "Error you should login first." ? "error" : "success"
-          }
+          severity={status === "error" ? "error" : "success"}
           sx={{ color: "white" }}
         >
           {t(message)}.
@@ -56,4 +54,5 @@ Toast.propTypes = {
   open: PropTypes.bool,
   setOpen: PropTypes.func,
   message: PropTypes.string,
+  status: PropTypes.string,
 };

@@ -17,6 +17,7 @@ import PropTypes from "prop-types";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../fireBaseConfig";
 import { UserContext } from "../../contexts/UserContext";
+import { useToast } from "../../hooks/useToast";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -25,6 +26,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 function LogOutDialog({ open, close }) {
   const { setUserInfo } = useContext(UserContext);
   const { t, i18n } = useTranslation();
+  const { handleShow } = useToast();
   const isRTL = i18n.language === "ar";
 
   async function handleLogout() {
@@ -41,7 +43,10 @@ function LogOutDialog({ open, close }) {
         email: "",
       });
     } catch (error) {
-      console.log("Error", error);
+      handleShow({
+        message: error.message,
+        type: "error",
+      });
     }
   }
 

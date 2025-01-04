@@ -27,6 +27,7 @@ import { useTranslation } from "react-i18next";
 // Import ModeContext
 import { ModeContext } from "../contexts/Mode";
 import { UserContext } from "../contexts/UserContext";
+import { useToast } from "../hooks/useToast";
 
 function Signup() {
   const { userInfo, setUserInfo } = useContext(UserContext);
@@ -83,6 +84,7 @@ function Signup() {
   };
 
   const { dark } = useContext(ModeContext);
+  const { handleShow } = useToast();
 
   // fire base
   const signUp = async (e) => {
@@ -143,7 +145,10 @@ function Signup() {
       });
       window.location.href = "/";
     } catch (error) {
-      console.log("Error", error);
+      handleShow({
+        message: error.message,
+        status: "error",
+      });
       throw error;
     }
   };

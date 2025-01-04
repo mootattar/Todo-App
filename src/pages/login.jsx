@@ -26,16 +26,18 @@ import { auth } from "../../fireBaseConfig";
 import { setPersistence, browserLocalPersistence } from "firebase/auth";
 // user context
 import { UserContext } from "../contexts/UserContext";
+import { useToast } from "../hooks/useToast";
 
 // mainURL
 
 function Login() {
   // userInfo
   const { userInfo, setUserInfo } = useContext(UserContext);
-  // Get the current theme mode (dark or light) from the context
   const { dark } = useContext(ModeContext);
-  // Get the current language and direction from the context
   const { t, i18n } = useTranslation();
+  // custom hooks
+  const { handleShow } = useToast();
+
   const isRTL = i18n.language === "ar";
   // State for errors
   const [error, setError] = useState({
@@ -89,7 +91,10 @@ function Login() {
       });
       window.location.href = "/";
     } catch (error) {
-      console.log("Error", error);
+      handleShow({
+        message: error.message,
+        status: "error",
+      });
       throw error;
     }
   };

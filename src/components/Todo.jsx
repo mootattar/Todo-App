@@ -11,14 +11,14 @@ import { UserContext } from "../contexts/UserContext";
 import { DrawerContext } from "../contexts/ContextDrawer";
 // components
 import TodoCard from "./TodoCard";
-import { useToast } from "../hooks/useToast";
 import { useStore } from "../hooks/useStore";
 // firebase
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../fireBaseConfig";
-import { doc, updateDoc } from "firebase/firestore";
-import { useCheckTaskDate } from "../hooks/useCheckTaskDate";
+import { useTaskStatus } from "../hooks/useTaskStatus";
 import { useShowHideDialog } from "../hooks/useDialog";
+import { filterTodos } from "../shared/filteredTodos";
+import { useToast } from "../hooks/useToast";
 
 const useStyles = makeStyles((theme) => ({
   floatingButton: {
@@ -41,17 +41,12 @@ const TodoUI = React.memo(() => {
   const { selected } = useContext(DrawerContext);
   const { userInfo } = useContext(UserContext);
 
-  const handleShowAdd = () => {
-    handleAdd();
-    AddbuttonRef.current.blur();
-  };
-
   // custom hooks
   const { state, dispatch } = useStore();
   const classes = useStyles();
-  const { handleShow } = useToast();
   const { handleAdd } = useShowHideDialog();
-  const { checkAndUpdateTasks } = useCheckTaskDate();
+  const { handleShow } = useToast();
+  const { checkAndUpdateTasks } = useTaskStatus();
   // categories
   const categories = [
     {
@@ -76,51 +71,14 @@ const TodoUI = React.memo(() => {
     },
   ];
 
-  const filteredTodos = useMemo(() => {
-    switch (selected) {
-      case "Home":
-        return state.todos.filter(
-          (todo) => todo.cat === "Home" && todo.endOfDay > todo.date
-        );
-      case "Work":
-        return state.todos.filter(
-          (todo) => todo.cat === "Work" && todo.endOfDay > todo.date
-        );
-      case "Personal":
-        return state.todos.filter(
-          (todo) => todo.cat === "Personal" && todo.endOfDay > todo.date
-        );
-      case "Health":
-        return state.todos.filter(
-          (todo) => todo.cat === "Health" && todo.endOfDay > todo.date
-        );
-      case "Study":
-        return state.todos.filter(
-          (todo) => todo.cat === "Study" && todo.endOfDay > todo.date
-        );
-      case "Devotional":
-        return state.todos.filter(
-          (todo) => todo.cat === "Devotional" && todo.endOfDay > todo.date
-        );
-      case "Other":
-        return state.todos.filter(
-          (todo) => todo.cat === "Other" && todo.endOfDay > todo.date
-        );
-      case "Completed":
-        return state.todos.filter((todo) => todo.ischecked);
-      case "Pending":
-        return state.todos.filter((todo) => todo.pending);
-      case "Uncompleted":
-        return state.todos.filter((todo) => !todo.pending && !todo.ischecked);
-      case "All":
-        return state.todos.filter((todo) => {
-          return todo.endOfDay > new Date().toISOString();
-        });
-      default:
-        return state.todos;
-    }
-  }, [selected, state.todos]);
-
+  const filteredTodos = useMemo(
+    () => filterTodos(state.todos, selected),
+    [selected, state.todos]
+  );
+  const handleShowAdd = () => {
+    handleAdd();
+    AddbuttonRef.current.blur();
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       checkAndUpdateTasks();
@@ -129,31 +87,6 @@ const TodoUI = React.memo(() => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.todos.length]);
-
-  const handleCheck = async (todo, id) => {
-    dispatch({ type: "completed", payload: id });
-    handleShow("Task Completed Successfully");
-    try {
-      const todosCollection = collection(db, "todos");
-      const q = query(todosCollection, where("id", "==", id));
-
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const todoDoc = querySnapshot.docs[0];
-        const todoRef = doc(db, "todos", todoDoc.id);
-
-        await updateDoc(todoRef, {
-          ischecked: !todo.ischecked,
-          pending: !todo.pending,
-        });
-      } else {
-        console.error("No document found with the given external ID.");
-      }
-    } catch (error) {
-      console.error("Error updating document:", error);
-    }
-  };
 
   useEffect(() => {
     const getTodos = async () => {
@@ -177,7 +110,10 @@ const TodoUI = React.memo(() => {
           payload: todos,
         });
       } catch (error) {
-        console.error("Error fetching todos:", error);
+        handleShow({
+          message: error.message,
+          status: "error",
+        });
         dispatch({ type: "FETCH_TODOS_FAILURE", payload: error.message });
       }
     };
@@ -230,14 +166,14 @@ const TodoUI = React.memo(() => {
         </Tooltip>
 
         <Grid container spacing={2}>
-          {filteredTodos.length === 0 && (
+          {filteredTodos?.length === 0 && (
             <Grid xs={12} style={{ textAlign: "center" }}>
               <Typography variant="h6" color="textSecondary">
                 {t("No todos found")}
               </Typography>
             </Grid>
           )}
-          {filteredTodos.map((todo, index) => (
+          {filteredTodos?.map((todo, index) => (
             <div className={`animateY delay${index}`} key={todo.id}>
               <TodoCard
                 color={
@@ -245,7 +181,6 @@ const TodoUI = React.memo(() => {
                   "#29b6f6"
                 }
                 todo={todo}
-                handleCheck={handleCheck}
               />
             </div>
           ))}

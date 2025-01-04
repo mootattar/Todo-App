@@ -13,8 +13,10 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import PropTypes from "prop-types";
 import { useShowHideDialog } from "../hooks/useDialog";
+import { useTaskStatus } from "../hooks/useTaskStatus";
 
-const TodoCard = React.memo(({ todo, handleCheck, color }) => {
+const TodoCard = React.memo(({ todo, color }) => {
+  const { handleCheck } = useTaskStatus();
   const { handleEditOpen, handleDeleteOpen } = useShowHideDialog();
   TodoCard.displayName = "TodoCard";
   const { t, i18n } = useTranslation();
@@ -66,7 +68,7 @@ const TodoCard = React.memo(({ todo, handleCheck, color }) => {
               className="animate delay4"
               size="small"
               checked={todo.ischecked}
-              onClick={() => handleCheck(todo, todo.id)}
+              onClick={() => handleCheck(todo, todo.id, t)}
               color="info"
               sx={{
                 color: "#29b6f6",
@@ -101,8 +103,5 @@ export default TodoCard;
 
 TodoCard.propTypes = {
   todo: PropTypes.object.isRequired,
-  handleCheck: PropTypes.func.isRequired,
-  // handleEditOpen: PropTypes.func.isRequired,
-  // handleDeleteOpen: PropTypes.func.isRequired,
   color: PropTypes.string.isRequired,
 };
